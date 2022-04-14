@@ -17,6 +17,8 @@ router.post('/getMessage', myHandle.getMessage)
 router.post('/deleteMessage', myHandle.deleteMessage)
 router.post('/updateMessageOpen', myHandle.updateMessageOpen)
 router.post('/getVoluntByUserid', myHandle.getVoluntByUserid)
+router.post('/isAttention', myHandle.isAttention)
+router.post('/addAttention', myHandle.addAttention)
 
 // 将路由器 共享出去
 module.exports = router

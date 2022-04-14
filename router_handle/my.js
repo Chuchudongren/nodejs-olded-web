@@ -186,3 +186,70 @@ exports.getVoluntByUserid = (req, res) => {
         } else res.cc('未查询到数据', 401)
     })
 }
+
+exports.isAttention = (req, res) => {
+    const id = req.body.id
+    const userid = req.body.userid
+    const selectSql = `select attentionid from attention where userid = ? and Auserid = ?`
+    db.query(selectSql, [userid, id], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.length > 0) {
+            res.send({
+                status: 200,
+                isAttention: true
+            })
+        }
+        else {
+            res.send({
+                status: 200,
+                isAttention: false
+            })
+        }
+    })
+}
+exports.addAttention = (req, res) => {
+    const boolean = req.body.boolean
+    const id = req.body.id
+    const userid = req.body.userid
+    const insertSql = `insert into attention (userid,Auserid) values (?,?)`
+    const updateSql1 = `update userinfo set fans = fans+? where userid = ?`
+    const updateSql2 = `update userinfo set attention = attention+? where userid = ?`
+    const deleteSql = `delete from attention where userid = ? and Auserid = ?`
+    if (boolean === 'true') {
+        db.query(insertSql, [userid, id], (err, result) => {
+            if (err) return res.cc(err)
+            if (result.affectedRows === 1) {
+                db.query(updateSql1, [1, id])
+                db.query(updateSql2, [1, userid])
+                res.send({
+                    status: 200,
+                    message: '关注成功！'
+                })
+            }
+            else {
+                res.send({
+                    status: 401,
+                    message: '关注失败！'
+                })
+            }
+        })
+    } else {
+        db.query(deleteSql, [userid, id], (err, result) => {
+            if (err) return res.cc(err)
+            if (result.affectedRows === 1) {
+                db.query(updateSql1, [-1, id])
+                db.query(updateSql2, [-1, userid])
+                res.send({
+                    status: 200,
+                    message: '取消成功！'
+                })
+            }
+            else {
+                res.send({
+                    status: 401,
+                    message: '取消失败！'
+                })
+            }
+        })
+    }
+}
