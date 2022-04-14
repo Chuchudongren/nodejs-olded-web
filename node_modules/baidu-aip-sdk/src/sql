@@ -1,0 +1,33 @@
+
+
+CREATE TABLE `pl_total_call_amount` (
+  `id` bigint(20) NOT NULL primary key auto_increment COMMENT '主键id',
+  `time` varchar(32) NOT NULL  COMMENT '时间 eg 2020-04-01 00:00:00',
+  `cnt` bigint(20) NOT NULL DEFAULT 0 COMMENT '累计调用次数统计表',
+  INDEX `time` (`time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='累计调用次数统计表'
+
+CREATE TABLE `pl_speech_total_call_amount` (
+  `id` bigint(20) NOT NULL primary key auto_increment COMMENT '主键id',
+  `time` varchar(32) NOT NULL  COMMENT '时间 eg 2020-04-01 00:00:00',
+  `cnt` bigint(20) NOT NULL DEFAULT 0 COMMENT '语音累计调用次数统计表',
+  INDEX `time` (`time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='语音累计调用次数统计表';
+
+CREATE TABLE `pl_api_call_top` (
+  `id` bigint(20) NOT NULL primary key auto_increment COMMENT '主键id',
+  `time` varchar(32) NOT NULL  COMMENT '时间 eg 2020-04-01 00:00:00',
+  `apis` varchar(3500) NOT NULL DEFAULT '' COMMENT "每秒调用的次数服务",
+  INDEX `time` (`time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='api 每秒调用topN';
+
+CREATE TABLE `pl_api_call_city_top` (
+  `id` bigint(20) NOT NULL primary key auto_increment COMMENT '主键id',
+  `time` varchar(32) NOT NULL  COMMENT '时间 eg 2020-04-01 00:00:00',
+  `citys` varchar(4000) NOT NULL DEFAULT '' COMMENT "每秒调用的次数服务topn 地区",
+  INDEX `time` (`time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='api 每秒调用topN';
+
+
+ select b.service_name,a.cnt from (select api_id ,sum(suc_cnt)+sum(fail_cnt) cnt  from aip_stat where stat_time ='2021-04-19 13:00:00' group by api_id order by cnt desc limit 100) a
+  left join  aip_api b on a.api_id=b.id

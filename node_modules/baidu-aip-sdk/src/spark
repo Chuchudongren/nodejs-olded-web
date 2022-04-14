@@ -1,0 +1,4 @@
+spark 任务 机器
+	ssh work@yq01-ecom-holmes22-20150818112825.yq01.baidu.com
+
+inputDir="afs://szth.afs.baidu.com:9902/app/dt/minos/203589098/70040086/$dt/*/*"
