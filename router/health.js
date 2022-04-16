@@ -1,7 +1,7 @@
 const express = require('express')
 // 创建路由对象
 const router = express.Router()
-// 导入 用户路由处理函数模块
+// 导入 健康管理路由处理函数模块
 const healthHandle = require('../router_handle/health')
 
 router.post('/getHospitalList', healthHandle.getHospitalList)

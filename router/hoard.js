@@ -1,7 +1,7 @@
 const express = require('express')
 // 创建路由对象
 const router = express.Router()
-// 导入 用户路由处理函数模块
+// 导入 论坛路由处理函数模块
 const hoardHandle = require('../router_handle/hoard')
 
 router.post('/getTopicListByCate', hoardHandle.getTopicListByCate)

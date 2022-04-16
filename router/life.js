@@ -1,7 +1,7 @@
 const express = require('express')
 // 创建路由对象
 const router = express.Router()
-// 导入 用户路由处理函数模块
+// 导入 生活服务路由处理函数模块
 const lifeHandle = require('../router_handle/life')
 
 router.post('/volunt/list', lifeHandle.voluntlist)

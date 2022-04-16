@@ -1,3 +1,6 @@
+/*
+    在这里定义和个人中心相关的路由处理函数，供 /router/my.js 模块进行调用
+*/
 
 // 导入 数据库 操作模块
 const e = require('express')

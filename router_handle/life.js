@@ -1,5 +1,5 @@
 /*
-    在这里定义和新闻相关的路由处理函数，供 /router/news.js 模块进行调用
+    在这里定义和生活服务相关的路由处理函数，供 /router/life.js 模块进行调用
 */
 // 导入 数据库 操作模块
 const db = require('../db/index')

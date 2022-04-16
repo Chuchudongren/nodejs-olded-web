@@ -1,3 +1,7 @@
+/*
+    在这里定义和论坛相关的路由处理函数，供 /router/hoard.js 模块进行调用
+*/
+
 const db = require('../db/index')
 
 const util = require('./util')

@@ -1,3 +1,7 @@
+/* 
+    日期处理工具
+*/
+
 exports.clearData = (str, ...arr) => {
     str.map(item => {
         arr.map(arritem => {
