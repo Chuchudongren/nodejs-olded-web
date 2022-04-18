@@ -256,3 +256,22 @@ exports.addAttention = (req, res) => {
         })
     }
 }
+exports.getClinicRecord = (req, res) => {
+    const userid = req.body.userid
+    const selectSql = `select a.clinicrecord,a.clinicid,b.name,b.tel,a.treatmentdate,a.timeslot,a.status
+    from clinicrecord a
+    left join clinic b
+    on a.clinicid = b.clinicid
+    where a.userid = ?
+    order by status asc`
+    db.query(selectSql, [userid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearData(results, 'treatmentdate')
+            res.send({
+                success: 200,
+                results: newResults
+            })
+        } else res.cc('没有数据！', 200)
+    })
+}

@@ -343,17 +343,20 @@ exports.getMp3 = (req, res) => {
     const tex = req.body.tex
     var AipSpeechClient = require("baidu-aip-sdk").speech;
     // 设置APPID/AK/SK
-    var APP_ID = "25883932";
-    var API_KEY = "vSXDU1oc1feHdWszpxVLBZSx";
-    var SECRET_KEY = "uBvX5Op5UlsxlRQaMhnEW7ZCCkZX33Ry";
+
+    // var APP_ID = "25883932";
+    // var API_KEY = "vSXDU1oc1feHdWszpxVLBZSx";
+    // var SECRET_KEY = "uBvX5Op5UlsxlRQaMhnEW7ZCCkZX33Ry";
+
+    var APP_ID = "25987075";
+    var API_KEY = "VC5g8D64gzLAEkbw8HGdjeGP";
+    var SECRET_KEY = "1ha16w70QPQ3XpDgOyz1dIADOqD6G9LR";
     // 新建一个对象，建议只保存一个对象调用服务接口
     var client = new AipSpeechClient(APP_ID, API_KEY, SECRET_KEY);
     var HttpClient = require("baidu-aip-sdk").HttpClient;
     // 设置request库的一些参数，例如代理服务地址，超时时间等
     // request参数请参考 https://github.com/request/request#requestoptions-callback
     HttpClient.setRequestOptions({ timeout: 5000 });
-    // 语音合成
-    var fs = require('fs');
     // 语音合成, 附带可选参数
     client.text2audio(tex, { spd: 5, per: 103 }).then(function (result) {
         if (result.data) {

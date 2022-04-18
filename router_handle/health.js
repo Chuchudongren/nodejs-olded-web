@@ -57,10 +57,8 @@ exports.getclinicList = (req, res) => {
     })
 }
 exports.setClinicRecord = (req, res) => {
-    // const userid = req.body.userid
-    let userid = '3'
-    // const clinicid = req.body.clinicid
-    let clinicid = '15'
+    const userid = req.body.userid
+    const clinicid = req.body.clinicid
     let tel = req.body.tel
     let province = req.body.province
     let city = req.body.city
