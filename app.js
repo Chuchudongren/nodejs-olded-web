@@ -28,15 +28,15 @@ app.use((req, res, next) => {
   next()
 })
 
-/* // 配置解析Token的中间件
+// 配置解析Token的中间件
 // 使用 .unless({path:[/^\/api\//]}) 指定 哪些接口不需要进行 token 的身份认证
 //2020年7月7日在express-jwt更新之后，安装使用express-jwt模块会默认为6.0.0版本，更新后的express-jwt需要在配置中加入algorithms属性，即设置jwt的算法。一般HS256为配置algorithms的默认值。
-app.use(
-  expressJWT({
-    secret: config.jwtSecretKey,
-    algorithms: ['HS256'],
-  }).unless({ path: [/^\/user\//] })
-) */
+// app.use(
+//   expressJWT({
+//     secret: config.jwtSecretKey,
+//     algorithms: ['HS256'],
+//   }).unless({ path: [/^\/user\//] })
+// )
 
 // 导入并使用 用户路由模块
 const User = require('./router/user')
@@ -64,6 +64,14 @@ app.use('/hoard', Hoard)
 // 导入并使用 个人中心路由模块
 const My = require('./router/my')
 app.use('/my', My)
+
+
+// 导入并使用 后台管理路由模块
+const Admin = require('./router/adminApi')
+app.use('/admin', expressJWT({
+  secret: config.jwtSecretKey,
+  algorithms: ['HS256'],
+}).unless({ path: [/^\/admin\/login/] }), Admin)
 
 // 讲 uploads 目录中的图片托管为静态
 app.use('/uploads', express.static('./uploads'))

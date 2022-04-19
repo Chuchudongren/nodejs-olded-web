@@ -185,14 +185,14 @@ exports.getvolunthot = (req, res) => {
 exports.voluntaddinfo = (req, res) => {
     const values = req.body
     const insertSql = `insert into uservoluntinfo set ?`
-    const updateSql = `update userinfo set isvolunt = 1 where userid = ?`
+    const updateSql = `update userinfo set isvolunt = 2 where userid = ?`
     const selectSql = `select userid from uservoluntinfo where userid = ? `
     const updateUserVInfoSql = `update uservoluntinfo set ?  where userid = ? `
     db.query(selectSql, [values.userid], (err, results) => {
         if (err) return res.cc(err)
         if (results.length > 0) {
             db.query(updateUserVInfoSql, [values, values.userid], (err1, results1) => {
-                if (err) res.cc(err);
+                if (err1) res.cc(err1);
                 res.send({
                     status: 200,
                     msg: '修改成功！'
@@ -203,7 +203,7 @@ exports.voluntaddinfo = (req, res) => {
             db.query(updateSql, [values.userid])
             res.send({
                 status: 200,
-                msg: '注册成功！'
+                msg: '申请成功，审核通过后即可参加志愿活动！'
             })
         }
     })
