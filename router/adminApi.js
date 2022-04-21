@@ -10,6 +10,12 @@ router.get('/user', AdminHandle.user)
 router.post('/changeRoleById', AdminHandle.changeRoleById)
 router.post('/disabledUser', AdminHandle.disabledUser)
 router.post('/addAdmin', AdminHandle.addAdmin)
+router.get('/getNewsList', AdminHandle.getNewsList)
+router.post('/deleteNewsByid', AdminHandle.deleteNewsByid)
+router.post('/setHotNews', AdminHandle.setHotNews)
+router.get('/getCategory', AdminHandle.getCategory)
+router.post('/addNews', AdminHandle.addNews)
+router.post('/getNewsById', AdminHandle.getNewsById)
 
 // 将路由器 共享出去
 module.exports = router
