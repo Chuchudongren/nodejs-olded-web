@@ -16,6 +16,15 @@ router.post('/setHotNews', AdminHandle.setHotNews)
 router.get('/getCategory', AdminHandle.getCategory)
 router.post('/addNews', AdminHandle.addNews)
 router.post('/getNewsById', AdminHandle.getNewsById)
+router.get('/getVoluntLIst', AdminHandle.getVoluntLIst)
+router.post('/deleteVoluntById', AdminHandle.deleteVoluntById)
+router.post('/setHotVolunt', AdminHandle.setHotVolunt)
+router.post('/setVoluntStatus', AdminHandle.setVoluntStatus)
+router.post('/getVoluntById', AdminHandle.getVoluntById)
+router.post('/addVolunt', AdminHandle.addVolunt)
+router.get('/getVoluntUserList', AdminHandle.getVoluntUserList)
+router.post('/deleteVoluntUserByUserid', AdminHandle.deleteVoluntUserByUserid)
+router.post('/setUserIsvolunt', AdminHandle.setUserIsvolunt)
 
 // 将路由器 共享出去
 module.exports = router

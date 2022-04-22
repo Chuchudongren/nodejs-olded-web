@@ -4,6 +4,7 @@
 
 const jwt = require('jsonwebtoken')
 const { jwtSecretKey, expiresIn } = require('../config')
+const util = require('./util')
 // 导入 数据库 操作模块
 const db = require('../db/index')
 
@@ -52,7 +53,8 @@ exports.getRoleRights = (req, res) => {
     from rolerights a 
     left join rights b
     on a.rightid = b.rightid
-    where a.roleid = ?`
+    where a.roleid = ?
+    order by a.rightid asc`
     db.query(selectSql, [roleid], (err, results) => {
         if (err) return res.cc(err)
         let newResults = roleRight(results)
@@ -138,13 +140,11 @@ exports.getNewsList = (req, res) => {
     })
 }
 exports.deleteNewsByid = (req, res) => {
-    console.log('1');
     const newsid = req.body.newsid
     const deleteSql = `delete from news where newsid = ?`
     console.log(newsid);
     db.query(deleteSql, [newsid], (err, result) => {
-        // if (err) res.cc(err)
-        if (err) console.log(err)
+        if (err) res.cc(err)
         if (result.affectedRows === 1) res.cc('删除成功！', 200)
         else res.cc('删除失败！', 401)
     })
@@ -201,8 +201,80 @@ exports.addNews = (req, res) => {
 }
 exports.getNewsById = (req, res) => {
     const newsid = req.body.newsid
-    const selectSql = `select * from news where newsid =? `
+    const selectSql = `select *  from news where newsid =? `
     db.query(selectSql, [newsid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newsResult = util.clearDataTime(results, 'pushtime')
+            res.send({
+                status: 200,
+                results: newsResult[0]
+            })
+        }
+    })
+}
+exports.getVoluntLIst = (req, res) => {
+    const selectSql = `select voluntid,title,status,isrecommend,classification from volunt`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.deleteVoluntById = (req, res) => {
+    const voluntid = req.body.voluntid
+    const deleteSql = `delete from volunt where voluntid = ?`
+    db.query(deleteSql, [voluntid], (err, result) => {
+        if (err) res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+        else res.cc('删除失败！', 401)
+    })
+}
+exports.setHotVolunt = (req, res) => {
+    const voluntid = req.body.voluntid
+    const isrecommend = req.body.isrecommend === '1' ? 1 : 0
+    const updateSql = `update volunt set isrecommend = ? where voluntid = ?`
+    db.query(updateSql, [isrecommend, voluntid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc(isrecommend === 1 ? '添加推荐成功！' : '取消推荐成功！', 200)
+        else res.cc('修改失败！', 401)
+    })
+}
+exports.setVoluntStatus = (req, res) => {
+    const voluntid = req.body.voluntid
+    const status = req.body.status
+    const updateSql = `update volunt set status = ? where voluntid = ?`
+    db.query(updateSql, [status, voluntid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.addVolunt = (req, res) => {
+    const title = req.body.title
+    const content = req.body.content
+    const space = req.body.space
+    const begintime = req.body.begintime
+    const finishtime = req.body.finishtime
+    const pic = req.body.pic
+    const teamname = req.body.teamname
+    const tel = req.body.tel
+    const classification = req.body.classification
+    const insertSql = `insert into volunt (title, content, space, begintime, finishtime,pic,teamname,tel, classification) values (?,?,?,?,?,?,?,?,?)`
+    db.query(insertSql, [title, content, space, begintime, finishtime, pic, teamname, tel, classification], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) {
+            res.cc('发布成功！', 200)
+        }
+    })
+}
+exports.getVoluntById = (req, res) => {
+    const voluntid = req.body.voluntid
+    const selectSql = `select * from volunt where voluntid = ?`
+    db.query(selectSql, [voluntid], (err, results) => {
         if (err) return res.cc(err)
         if (results.length > 0) {
             res.send({
@@ -210,5 +282,46 @@ exports.getNewsById = (req, res) => {
                 results: results[0]
             })
         }
+    })
+}
+exports.getVoluntUserList = (req, res) => {
+    const selectSql = `select a.userid,a.nickname,a.isvolunt,b.voluntinfoid, b.realname,b.gender,b.volunttype,b.residence0,b.residence1,b.residence2,b.education,b.politicalstatus,b.nationality,b.idnumber,b.employment,b.specialty,b.tel
+    from userinfo a
+    left join uservoluntinfo b
+    on a.userid = b.userid
+    where a.isvolunt = 1 or a.isvolunt = 2`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.deleteVoluntUserByUserid = (req, res) => {
+    const voluntinfoid = req.body.voluntinfoid
+    const userid = req.body.userid
+    console.log(userid);
+    const deleteSql = `delete from uservoluntinfo where voluntinfoid = ?`
+    const updateSql = `update userinfo set isvolunt = 0 where userid = ?`
+    db.query(deleteSql, [voluntinfoid], (err, result) => {
+        if (err) res.cc(err)
+        if (result.affectedRows === 1) {
+            db.query(updateSql, [userid], (err1, result1) => {
+                if (err1) res.cc(err1)
+                if (result1.affectedRows === 1) res.cc('删除成功！', 200)
+            })
+        }
+        else res.cc('删除失败！', 401)
+    })
+}
+exports.setUserIsvolunt = (req, res) => {
+    const userid = req.body.userid
+    const updateSql = `update userinfo set isvolunt = 1 where userid = ?`
+    db.query(updateSql, [userid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
     })
 }
