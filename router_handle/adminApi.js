@@ -142,7 +142,6 @@ exports.getNewsList = (req, res) => {
 exports.deleteNewsByid = (req, res) => {
     const newsid = req.body.newsid
     const deleteSql = `delete from news where newsid = ?`
-    console.log(newsid);
     db.query(deleteSql, [newsid], (err, result) => {
         if (err) res.cc(err)
         if (result.affectedRows === 1) res.cc('删除成功！', 200)
@@ -303,7 +302,6 @@ exports.getVoluntUserList = (req, res) => {
 exports.deleteVoluntUserByUserid = (req, res) => {
     const voluntinfoid = req.body.voluntinfoid
     const userid = req.body.userid
-    console.log(userid);
     const deleteSql = `delete from uservoluntinfo where voluntinfoid = ?`
     const updateSql = `update userinfo set isvolunt = 0 where userid = ?`
     db.query(deleteSql, [voluntinfoid], (err, result) => {
@@ -323,5 +321,220 @@ exports.setUserIsvolunt = (req, res) => {
     db.query(updateSql, [userid], (err, result) => {
         if (err) return res.cc(err)
         if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+
+exports.getMessageList = (req, res) => {
+    const selectSql = `select * from usermessage order by isreply asc`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearData(results, 'questiontime', 'replytime')
+            res.send({
+                status: 200,
+                results: newResults
+            })
+        }
+    })
+}
+exports.setUserMessage = (req, res) => {
+    const reply = req.body.reply
+    const adminid = req.body.adminid
+    const messageid = req.body.messageid
+    const readMp3 = req.body.read
+    const replytime = new Date()
+    const updateSql = `update usermessage set isreply = 1, reply = ?,replytime = ?,adminid = ?,readMp3=? where messageid = ?`
+    db.query(updateSql, [reply, replytime, adminid, readMp3, messageid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.deleteMessageById = (req, res) => {
+    const messageid = req.body.messageid
+    const deleteSql = `delete from usermessage where messageid = ?`
+    db.query(deleteSql, [messageid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.getLawdynamicList = (req, res) => {
+    const selectSql = `select * from lawdynamic`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.deleteLawdynamicById = (req, res) => {
+    const dynamicid = req.body.dynamicid
+    const deleteSql = `delete from lawdynamic where dynamicid = ?`
+    db.query(deleteSql, [dynamicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.UpdateLawdynamic = (req, res) => {
+    const dynamicid = req.body.dynamicid
+    const title = req.body.title
+    const content = req.body.content
+    const theme = req.body.theme
+    const themename = theme === '0' ? '主题活动' : (theme === '1' ? '普法锦集' : '环球法治')
+    const updateSql = `update lawdynamic set title=?,content=?,theme=?,themename=? where dynamicid= ?`
+    db.query(updateSql, [title, content, theme, themename, dynamicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.AddLawdynamic = (req, res) => {
+    const title = req.body.title
+    const content = req.body.content
+    const theme = req.body.theme
+    const themename = theme === '0' ? '主题活动' : (theme === '1' ? '普法锦集' : '环球法治')
+    const insertSql = `insert into lawdynamic(title, content, theme, themename) values (?,?,?,?)`
+    db.query(insertSql, [title, content, theme, themename], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) {
+            res.send({
+                status: 200,
+                message: '发布成功！',
+                dynamicid: result.insertId
+            })
+        }
+    })
+}
+
+
+exports.getServiceList = (req, res) => {
+    const selectSql = `select a.servicelistid,a.pic,a.title,a.conpany,a.servicearea,a.province,
+    a.city,a.tel,a.serviceid,b.name,b.category
+     from servicelist a
+     left join service b
+     on a.serviceid=b.serviceid`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.addService = (req, res) => {
+    const title = req.body.title
+    const conpany = req.body.conpany
+    const servicearea = req.body.servicearea
+    const province = req.body.province
+    const city = req.body.city
+    const tel = req.body.tel
+    const category = req.body.category
+    const name = req.body.name
+    const pic = req.body.pic
+    const selectSql = `select serviceid from service where name = ?`
+    const insertSql = `insert into servicelist (pic,title,conpany,servicearea,province,city,tel,serviceid) 
+    values (?,?,?,?,?,?,?,?)`
+    db.query(selectSql, [name, category], (err1, results) => {
+        if (err1) return res.cc(err1)
+        if (results.length > 0) {
+            let serviceid = results[0].serviceid
+            db.query(insertSql, [pic, title, conpany, servicearea, province, city, tel, serviceid], (err2, result) => {
+                if (err2) return res.cc(err2)
+                if (result.affectedRows === 1) {
+                    res.send({
+                        status: 200,
+                        message: '发布成功！',
+                        servicelistid: result.insertId
+                    })
+                }
+            })
+        }
+    })
+}
+exports.UpdateService = (req, res) => {
+    const servicelistid = req.body.servicelistid
+    const title = req.body.title
+    const conpany = req.body.conpany
+    const servicearea = req.body.servicearea
+    const province = req.body.province
+    const city = req.body.city
+    const tel = req.body.tel
+    const category = req.body.category
+    const name = req.body.name
+    const pic = req.body.pic
+    const selectSql = `select serviceid from service where name = ?`
+    const updateSql = `update servicelist set pic = ?, title = ?, conpany = ?, servicearea = ?, province = ?, city = ?, tel = ?,serviceid=? where servicelistid = ?`
+    db.query(selectSql, [name, category], (err1, results) => {
+        if (err1) return res.cc(err1)
+        if (results.length > 0) {
+            let serviceid = results[0].serviceid
+            db.query(updateSql, [pic, title, conpany, servicearea, province, city, tel, serviceid, servicelistid], (err, result) => {
+                if (err) return res.cc(err)
+                if (result.affectedRows === 1) res.cc('修改成功！', 200)
+            })
+        }
+    })
+}
+exports.deleteService = (req, res) => {
+    const servicelistid = req.body.servicelistid
+    const deleteSql = `delete form servicelist where servicelistid =?`
+    db.query(deleteSql, [servicelistid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+
+exports.getServiceTabList = (req, res) => {
+    const selectSql1 = `select * from servicetab`
+    const selectSql2 = `select servicelistid,conpany from servicelist`
+    db.query(selectSql2, (err1, results1) => {
+        if (err1) return res.cc(err1)
+        if (results1.length > 0) {
+            db.query(selectSql1, (err2, results2) => {
+                if (err2) return res.cc(err2)
+                let results = [...results1]
+                results.map(item => {
+                    let tabs = []
+                    results2.map(d => {
+                        if (d.servicelistid === item.servicelistid) {
+                            tabs.push(d.tabname)
+                        }
+                    })
+                    item.tabs = tabs
+                })
+                res.send({
+                    status: 200,
+                    results
+                })
+            })
+        }
+    })
+}
+exports.deleteServiceTab = (req, res) => {
+    const servicelistid = req.body.servicelistid
+    const tabname = req.body.tabname
+    const selectSql = `select tabid from servicetab where servicelistid = ? and tabname = ?`
+    const deleteSql = `delete from servicetab where tabid = ?`
+    db.query(selectSql, [servicelistid, tabname], (err1, results) => {
+        if (err1) return res.cc(err1)
+        if (results.length > 0) {
+            let tabid = results[0].tabid
+            db.query(deleteSql, [tabid], (err2, result) => {
+                if (err2) return res.cc(err2)
+                if (result.affectedRows === 1) res.cc('删除成功！', 200)
+            })
+        }
+    })
+}
+exports.addTabname = (req, res) => {
+    const servicelistid = req.body.servicelistid
+    const tabname = req.body.tabname
+    const insertSql = `insert into servicetab (servicelistid, tabname) values (?,?)`
+    db.query(insertSql, [servicelistid, tabname], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('添加成功！', 200)
     })
 }
