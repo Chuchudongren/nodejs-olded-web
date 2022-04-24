@@ -101,7 +101,7 @@ exports.changeRoleById = (req, res) => {
 }
 exports.disabledUser = (req, res) => {
     const adminid = req.body.adminid
-    const state = req.body.state === 0 ? 1 : 0
+    const state = req.body.state === '0' ? 0 : 1
     const updateSql = `update admin set state = ? where adminid = ?`
     db.query(updateSql, [state, adminid])
 }
@@ -536,5 +536,241 @@ exports.addTabname = (req, res) => {
     db.query(insertSql, [servicelistid, tabname], (err, result) => {
         if (err) return res.cc(err)
         if (result.affectedRows === 1) res.cc('添加成功！', 200)
+    })
+}
+
+exports.getHospitalList = (req, res) => {
+    const selectSql = `select * from hospitallist`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.addHospital = (req, res) => {
+    const pic = req.body.pic
+    const hospitaladdress = req.body.hospitaladdress
+    const hospitalname = req.body.hospitalname
+    const introduce = req.body.introduce
+    const province = req.body.province
+    const city = req.body.city
+    const tel = req.body.tel
+    const twoDcode = req.body.twoDcode
+    const website = req.body.website
+    const insertSql = `insert into hospitallist (pic,hospitaladdress, hospitalname, introduce, province, city, tel, twoDcode,website)  values (?,?,?,?,?,?,?,?,?)`
+    db.query(insertSql, [pic, hospitaladdress, hospitalname, introduce, province, city, tel, twoDcode, website], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) {
+            res.send({
+                status: 200,
+                message: '发布成功！',
+                hospitallistid: result.insertId
+            })
+        }
+    })
+}
+exports.UpdateHospital = (req, res) => {
+    const hospitallistid = req.body.hospitallistid
+    const pic = req.body.pic
+    const hospitaladdress = req.body.hospitaladdress
+    const hospitalname = req.body.hospitalname
+    const introduce = req.body.introduce
+    const province = req.body.province
+    const city = req.body.city
+    const tel = req.body.tel
+    const twoDcode = req.body.twoDcode
+    const website = req.body.website
+    const updateSql = `update hospitallist set pic=?,hospitaladdress=?, hospitalname=?, introduce=?, province=?, city=?, tel=?, twoDcode=?,website=? where hospitallistid = ?`
+    db.query(updateSql, [pic, hospitaladdress, hospitalname, introduce, province, city, tel, twoDcode, website, hospitallistid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.deleteHospital = (req, res) => {
+    const hospitallistid = req.body.hospitallistid
+    const deleteSql = `delete from hospitallist where hospitallistid =?`
+    db.query(deleteSql, [hospitallistid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.getClinicRecord = (req, res) => {
+    const selectSql = `select a.clinicrecord ,a.userid,a.clinicid,a.tel,a.province,a.city,a.address,a.represent,a.detail,a.treatmentdate,a.timeslot,a.status,a.pushtime,a.finishtime,b.name,b.tel as clinictel
+    from clinicrecord a left join clinic b on a.clinicid = b.clinicid`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearData(results, 'treatmentdate')
+            newResults = util.clearDataTime(newResults, 'pushtime', 'finishtime')
+            newResults.map(item => {
+                item.status = item.status === 0 ? '未开始' : (item.status === 1 ? '进行中' : '已结束')
+            })
+            res.send({
+                status: 200,
+                results: newResults
+            })
+        }
+    })
+}
+exports.deleteClinicRecord = (req, res) => {
+    const clinicrecord = req.body.clinicrecord
+    const deleteSql = `delete from clinicrecord where clinicrecord =?`
+    db.query(deleteSql, [clinicrecord], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.updateClinicRecord = (req, res) => {
+    const clinicrecord = req.body.clinicrecord
+    const status = req.body.status === '未开始' ? 0 : (req.body.status === '进行中' ? 1 : 2)
+    const finishtime = new Date()
+    const updateSql1 = `update clinicrecord set status = ?, finishtime = ? where clinicrecord = ?`
+    const updateSql2 = `update clinicrecord set status = ? where clinicrecord = ?`
+    if (status === 2) {
+        db.query(updateSql1, [status, finishtime, clinicrecord], (err, result) => {
+            if (err) return res.cc(err)
+            if (result.affectedRows === 1) res.cc('修改成功！', 200)
+        })
+    } else {
+        db.query(updateSql2, [status, clinicrecord], (err, result) => {
+            if (err) return res.cc(err)
+            if (result.affectedRows === 1) res.cc('修改成功！', 200)
+        })
+    }
+}
+exports.getClinic = (req, res) => {
+    const selectSql = `select * from clinic`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.updateClinic = (req, res) => {
+    const clinicid = req.body.clinicid
+    const name = req.body.name
+    const introduce = req.body.introduce
+    const tel = req.body.tel
+    const address = req.body.address
+    const province = req.body.province
+    const city = req.body.city
+    const updateSql = `update clinic set name = ? , introduce = ? , tel = ?,address=?,province=?,city=? where clinicid = ?`
+    db.query(updateSql, [name, introduce, tel, address, province, city, clinicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.deleteClinic = (req, res) => {
+    const clinicid = req.body.clinicid
+    const deleteSql = `delete from clinic where clinicid =?`
+    db.query(deleteSql, [clinicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.addClinic = (req, res) => {
+    const name = req.body.name
+    const introduce = req.body.introduce
+    const tel = req.body.tel
+    const address = req.body.address
+    const province = req.body.province
+    const city = req.body.city
+    const insertSql = `insert into clinic (name, introduce, tel, address, province, city) values (?,?,?,?,?,?)`
+    db.query(insertSql, [name, introduce, tel, address, province, city], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) {
+            res.send({
+                status: 200,
+                message: '添加成功！',
+                clinicid: result.insertId
+            })
+        }
+    })
+}
+
+exports.getHealthMsg = (req, res) => {
+    const selectSql = `select * from healthmsg`
+    db.query(selectSql, (err, results) => {
+        if (err) res.cc(err)
+        if (results.length > 0) {
+            let newResults = results
+            newResults.map(item => {
+                item.grade = item.grade === 1 ? '健康常识' : (item.grade === 2 ? '热点' : '膳食知识')
+            })
+            newResults = util.clearDataTime(newResults, 'pushtime')
+            res.send({
+                status: 200,
+                results: newResults
+            })
+        }
+    })
+}
+exports.setHealthMsgIsShow = (req, res) => {
+    const healthmsgid = req.body.healthmsgid
+    const isshow = req.body.isshow === '1' ? 1 : 0
+    const updateSql = `update healthmsg set isshow = ? where healthmsgid = ?`
+    db.query(updateSql, [isshow, healthmsgid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc(isshow === 1 ? '添加展示成功！' : '取消展示成功！', 200)
+        else res.cc('修改失败！', 401)
+    })
+}
+exports.updateHealthMsg = (req, res) => {
+    const healthmsgid = req.body.healthmsgid
+    const title = req.body.title
+    const pushtime = new Date()
+    const intro = req.body.intro
+    const grade = req.body.grade === '健康常识' ? 1 : (req.body.grade === '热点' ? 2 : 3)
+    const content = req.body.content
+    const updateSql = `update healthmsg set title = ? ,pushtime = ?,intro = ? ,grade = ? ,content = ? where healthmsgid = ?`
+    db.query(updateSql, [title, pushtime, intro, grade, content, healthmsgid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.addHealthMsg = (req, res) => {
+    const title = req.body.title
+    const pushtime = new Date()
+    const intro = req.body.intro
+    const grade = req.body.grade === '健康常识' ? 1 : (req.body.grade === '热点' ? 2 : 3)
+    const content = req.body.content
+    const insertSql = `insert into healthmsg (title,pushtime,intro,grade,content,isshow) values (?,?,?,?,?,0)`
+    db.query(insertSql, [title, pushtime, intro, grade, content], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('发布成功！', 200)
+    })
+}
+exports.deleteHealthMsg = (req, res) => {
+    const healthmsgid = req.body.healthmsgid
+    const deleteSql = `delete from healthmsg where healthmsgid =?`
+    db.query(deleteSql, [healthmsgid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.getHealthMsgById = (req, res) => {
+    const healthmsgid = req.body.healthmsgid
+    const selectSql = `select * from healthmsg where healthmsgid = ?`
+    db.query(selectSql, [healthmsgid], (err, results) => {
+        if (err) res.cc(err)
+        if (results.length > 0) {
+            let newResults = results
+            newResults.map(item => {
+                item.grade = item.grade === 1 ? '健康常识' : (item.grade === 2 ? '热点' : '膳食知识')
+            })
+            newResults = util.clearDataTime(newResults, 'pushtime')
+            res.send({
+                status: 200,
+                results: newResults[0]
+            })
+        }
     })
 }

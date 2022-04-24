@@ -5,7 +5,9 @@
 exports.clearData = (str, ...arr) => {
     str.map(item => {
         arr.map(arritem => {
-            item[arritem] = clearDataUtil(new Date(item[arritem]))
+            if (item[arritem]) {
+                item[arritem] = clearDataUtil(new Date(item[arritem]))
+            }
         })
     })
     return str
@@ -13,7 +15,9 @@ exports.clearData = (str, ...arr) => {
 exports.clearDataTime = (str, ...arr) => {
     str.map(item => {
         arr.map(arritem => {
-            item[arritem] = clearDataTimeUtil(new Date(item[arritem]))
+            if (item[arritem]) {
+                item[arritem] = clearDataTimeUtil(new Date(item[arritem]))
+            }
         })
     })
     return str
