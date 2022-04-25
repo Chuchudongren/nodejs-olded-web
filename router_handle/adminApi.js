@@ -774,3 +774,178 @@ exports.getHealthMsgById = (req, res) => {
         }
     })
 }
+exports.getHoardCateList = (req, res) => {
+    const selectSql = `select * from hoardcate`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.updateHoardCate = (req, res) => {
+    const hoardcate = req.body.hoardcate
+    const hoardcateid = req.body.hoardcateid
+    const updateSql = `update hoardcate set hoardcate = ? where hoardcateid = ?`
+    db.query(updateSql, [hoardcate, hoardcateid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+exports.addHoardCate = (req, res) => {
+    const hoardcate = req.body.hoardcate
+    const insertSql = `insert into hoardcate (hoardcate) values (?)`
+    db.query(insertSql, [hoardcate], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) {
+            res.send({
+                status: 200,
+                message: '发布成功！',
+                hoardcateid: result.insertId
+            })
+        }
+    })
+}
+exports.deleteHoardCateById = (req, res) => {
+    const hoardcateid = req.body.hoardcateid
+    const deleteSql = `delete from hoardcate where hoardcateid = ?`
+    db.query(deleteSql, [hoardcateid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.getTopicList = (req, res) => {
+    const selectSql = `select a.topicid,a.userid,a.title,a.ishot,a.cateid,b.hoardcate from topic a
+    left join hoardcate b on a.cateid = b.hoardcateid`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            res.send({
+                status: 200,
+                results
+            })
+        }
+    })
+}
+exports.deleteTopic = (req, res) => {
+    const topicid = req.body.topicid
+    const deleteSql = `delete from topic where topicid = ?`
+    db.query(deleteSql, [topicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.setTopicIsHot = (req, res) => {
+    const topicid = req.body.topicid
+    const ishot = req.body.ishot
+    const updateSql = `update topic set ishot = ? where topicid = ?`
+    db.query(updateSql, [ishot, topicid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('修改成功！', 200)
+    })
+}
+
+exports.getTopicByid = (req, res) => {
+    const topicid = req.body.topicid
+    const selectSql = `select a.topicid,a.userid,b.nickname,a.content,a.title,a.pushtime,a.hits,a.star,a.replytime,a.ishot,a.cateid,c.hoardcate from  topic a 
+    left join userinfo b on a.userid = b.userid 
+    left join hoardcate c on a.cateid = c.hoardcateid
+    where topicid = ?
+    order by a.pushtime desc`
+    db.query(selectSql, [topicid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearDataTime(results, 'pushtime', 'replytime')
+            res.send({
+                status: 200,
+                results: newResults[0]
+            })
+        } else {
+            res.cc('没有找到数据', 401)
+        }
+    })
+}
+exports.getTopicFollowByid = (req, res) => {
+    const topicid = req.body.topicid
+    const selectSql = `select a.topicfollowid,a.topicid,a.userid,b.nickname,a.pushtime,a.content,a.isMain from  topicfollow a
+    left join userinfo b 
+    on a.userid = b.userid
+    where modify = 0 and topicid = ?
+    order by a.pushtime desc`
+    db.query(selectSql, [topicid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearDataTime(results, 'pushtime')
+            res.send({
+                status: 200,
+                results: newResults
+            })
+        } else {
+            res.cc('没有找到数据', 401)
+        }
+    })
+}
+exports.getTopicCommentByid = (req, res) => {
+    const topicid = req.body.topicid
+    const selectSql = `select a.topiccommentid,a.topicfollowid,a.userid,c.nickname,a.content,a.pushtime,a.parentid 
+    from topiccomment a 
+    right join  topicfollow b 
+    on a.topicfollowid = b.topicfollowid 
+    left join userinfo c
+    on a.userid = c.userid
+    where b.topicid = ? `
+    db.query(selectSql, [topicid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) {
+            let newResults = util.clearDataTime(results, 'pushtime')
+            res.send({
+                status: 200,
+                results: newResults
+            })
+        } else {
+            res.cc('没有找到数据', 401)
+        }
+    })
+}
+exports.deleteTopicFollowById = (req, res) => {
+    const topicfollowid = req.body.topicfollowid
+    const deleteSql = `delete from topicfollow where topicfollowid = ?`
+    db.query(deleteSql, [topicfollowid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+exports.deleteCommentById = (req, res) => {
+    const topiccommentid = req.body.topiccommentid
+    const deleteSql1 = `delete from topiccomment where topiccommentid = ?`
+    const selectSql = `select topiccommentid from topiccomment where parentid = ? `
+    const deleteSql2 = `delete from topiccomment where FIND_IN_SET(topiccommentid,?)`
+    db.query(deleteSql1, [topiccommentid], (err1, result1) => {
+        if (err1) return res.cc(err1)
+        if (result1.affectedRows === 1) {
+            db.query(selectSql, [topiccommentid], (err2, results) => {
+                if (err2) return console.log(err2)
+                if (results.length > 0) {
+                    let arr = []
+                    results.map(item => arr.push(item.topiccommentid))
+                    db.query(deleteSql2, [...arr], (err3) => {
+                        if (err3) return res.cc(err3)
+                        res.cc('删除成功！', 200)
+                    })
+                }
+            })
+        }
+    })
+}
+exports.deleteSonCommentById = (req, res) => {
+    const topiccommentid = req.body.topiccommentid
+    const deleteSql = `delete from topiccomment where topiccommentid = ?`
+    db.query(deleteSql, [topiccommentid], (err, result) => {
+        if (err) return res.cc(err)
+        if (result.affectedRows === 1) res.cc('删除成功！', 200)
+    })
+}
+

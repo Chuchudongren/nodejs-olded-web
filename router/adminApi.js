@@ -56,6 +56,18 @@ router.post('/updateHealthMsg', AdminHandle.updateHealthMsg)
 router.post('/addHealthMsg', AdminHandle.addHealthMsg)
 router.post('/deleteHealthMsg', AdminHandle.deleteHealthMsg)
 router.post('/getHealthMsgById', AdminHandle.getHealthMsgById)
+router.get('/getHoardCateList', AdminHandle.getHoardCateList)
+router.post('/updateHoardCate', AdminHandle.updateHoardCate)
+router.post('/addHoardCate', AdminHandle.addHoardCate)
+router.post('/deleteHoardCateById', AdminHandle.deleteHoardCateById)
+router.get('/getTopicList', AdminHandle.getTopicList)
+router.post('/deleteTopic', AdminHandle.deleteTopic)
+router.post('/setTopicIsHot', AdminHandle.setTopicIsHot)
+router.post('/getTopicByid', AdminHandle.getTopicByid)
+router.post('/getTopicFollowByid', AdminHandle.getTopicFollowByid)
+router.post('/getTopicCommentByid', AdminHandle.getTopicCommentByid)
+router.post('/deleteTopicFollowById', AdminHandle.deleteTopicFollowById)
+router.post('/deleteCommentById', AdminHandle.deleteCommentById)
 
 // 将路由器 共享出去
 module.exports = router
