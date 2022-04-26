@@ -6,6 +6,7 @@ const AdminHandle = require('../router_handle/adminApi')
 
 router.post('/login', AdminHandle.login)
 router.post('/getRoleRights', AdminHandle.getRoleRights)
+router.post('/getRolesById', AdminHandle.getRolesById)
 router.get('/user', AdminHandle.user)
 router.post('/changeRoleById', AdminHandle.changeRoleById)
 router.post('/disabledUser', AdminHandle.disabledUser)
@@ -68,6 +69,14 @@ router.post('/getTopicFollowByid', AdminHandle.getTopicFollowByid)
 router.post('/getTopicCommentByid', AdminHandle.getTopicCommentByid)
 router.post('/deleteTopicFollowById', AdminHandle.deleteTopicFollowById)
 router.post('/deleteCommentById', AdminHandle.deleteCommentById)
+router.get('/getHomeNews', AdminHandle.getHomeNews)
+router.get('/getLawdynamicCount', AdminHandle.getLawdynamicCount)
+router.get('/getHomeService', AdminHandle.getHomeService)
+router.get('/getHomeClinicRecord', AdminHandle.getHomeClinicRecord)
+router.get('/getHomeHealthMsg', AdminHandle.getHomeHealthMsg)
+router.get('/getHomeHealthInfo', AdminHandle.getHomeHealthInfo)
+router.get('/getHomeHoard', AdminHandle.getHomeHoard)
+router.get('/getTopicHitTop5', AdminHandle.getTopicHitTop5)
 
 // 将路由器 共享出去
 module.exports = router

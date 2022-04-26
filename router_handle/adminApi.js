@@ -68,7 +68,17 @@ exports.getRoleRights = (req, res) => {
         }
     })
 }
-
+exports.getRolesById = (req, res) => {
+    const roleid = req.body.roleid
+    const selectSql = `select rolename from roles where roleid = ?`
+    db.query(selectSql, [roleid], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results: results[0]
+        })
+    })
+}
 exports.user = (req, res) => {
     const selectSql = `select a.adminid,a.username,a.password,a.roleid,b.rolename,a.state 
     from admin a
@@ -949,3 +959,97 @@ exports.deleteSonCommentById = (req, res) => {
     })
 }
 
+exports.getHomeNews = (req, res) => {
+    const selectSql = `select count(newsid) as count ,sum(a.great) as greatSum,sum(a.collect) as collectSum,b.categoryid,b.categoryname from news a
+    left join newscategory b on a.categoryid = b.categoryid group by categoryid; `
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getLawdynamicCount = (req, res) => {
+    const selectSql = `select count(dynamicid) as count,themename from lawdynamic group by themename;`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getHomeService = (req, res) => {
+    const selectSql = `select count(a.servicelistid) as count ,a.serviceid,b.name from servicelist a left join service b on a.serviceid = b.serviceid group by a.serviceid`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getHomeHealthMsg = (req, res) => {
+    const selectSql = `select count(healthmsgid) as count,grade from healthmsg group by grade;`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getHomeClinicRecord = (req, res) => {
+    const selectSql = `select count(clinicrecord) as count,timeslot from clinicrecord group by timeslot;`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getHomeHealthInfo = (req, res) => {
+    const selectSql1 = `select count(hospitallistid) as Hcount from hospitallist`
+    const selectSql2 = `select count(clinicid) as Ccount from clinic`
+    const selectSql3 = `select count(clinicrecord) as Rcount from clinicrecord`
+    db.query(selectSql1, (err1, results1) => {
+        if (err1) return res.cc(err1)
+        db.query(selectSql2, (err2, results2) => {
+            if (err2) return res.cc(err2)
+            db.query(selectSql3, (err3, results3) => {
+                if (err3) return res.cc(err3)
+                res.send({
+                    status: 200,
+                    counts: [results1[0], results2[0], results3[0]],
+                })
+            })
+        })
+    })
+}
+exports.getHomeHoard = (req, res) => {
+    const selectSql = `select count(a.topicid) as count,b.hoardcate from topic a left join hoardcate b on a.cateid = b.hoardcateid group by a.cateid`
+    db.query(selectSql, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length > 0) res.send({
+            status: 200,
+            results
+        })
+    })
+}
+exports.getTopicHitTop5 = (req, res) => {
+    const selectSql1 = `select title,hits,topicid from topic order by hits desc limit 0,4;`
+    const selectSql2 = `select title,star,topicid from topic order by star desc limit 0,4;`
+    db.query(selectSql1, (err, results) => {
+        if (err) return res.cc(err)
+        db.query(selectSql2, (err1, results1) => {
+            if (err1) return res.cc(err1)
+            res.send({
+                status: 200,
+                topicHitTop: results,
+                topicStarTop: results1
+            })
+        })
+    })
+}
