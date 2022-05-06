@@ -609,8 +609,9 @@ exports.deleteHospital = (req, res) => {
     })
 }
 exports.getClinicRecord = (req, res) => {
-    const selectSql = `select a.clinicrecord ,a.userid,a.clinicid,a.tel,a.province,a.city,a.address,a.represent,a.detail,a.treatmentdate,a.timeslot,a.status,a.pushtime,a.finishtime,b.name,b.tel as clinictel
-    from clinicrecord a left join clinic b on a.clinicid = b.clinicid`
+    const selectSql = `select a.clinicrecord ,c.nickname,a.userid,a.clinicid,a.tel,a.province,a.city,a.address,a.represent,a.detail,a.treatmentdate,a.timeslot,a.status,a.pushtime,a.finishtime,b.name,b.tel as clinictel
+    from clinicrecord a left join clinic b on a.clinicid = b.clinicid
+    left join userinfo c on c.userid = a.userid`
     db.query(selectSql, (err, results) => {
         if (err) return res.cc(err)
         if (results.length > 0) {
@@ -828,8 +829,9 @@ exports.deleteHoardCateById = (req, res) => {
     })
 }
 exports.getTopicList = (req, res) => {
-    const selectSql = `select a.topicid,a.userid,a.title,a.ishot,a.cateid,b.hoardcate from topic a
-    left join hoardcate b on a.cateid = b.hoardcateid`
+    const selectSql = `select a.topicid,c.nickname,a.userid,a.title,a.ishot,a.cateid,b.hoardcate from topic a
+    left join hoardcate b on a.cateid = b.hoardcateid
+    left join userinfo c on a.userid = c.userid`
     db.query(selectSql, (err, results) => {
         if (err) return res.cc(err)
         if (results.length > 0) {
