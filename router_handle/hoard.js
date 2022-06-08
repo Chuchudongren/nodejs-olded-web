@@ -12,7 +12,7 @@ exports.getTopicListByCate = (req, res) => {
     const selectSql = `select a.topicid,a.userid,b.nickname,a.title,a.pushtime,a.hits,a.star,a.replytime,a.ishot from  topic a 
     left join userinfo b 
     on a.userid = b.userid 
-    where modify = 0 and cateid = ?
+    where modify != 3 and cateid = ?
     order by a.pushtime desc`
     db.query(selectSql, [cateid], (err, results) => {
         if (err) return res.cc(err)

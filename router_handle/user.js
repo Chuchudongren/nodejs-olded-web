@@ -7,10 +7,6 @@ const db = require('../db/index')
 
 // 导入 加密的包
 const bcrypt = require('bcryptjs')
-// 导入 生成 Token 字符串的包
-const jwt = require('jsonwebtoken')
-// 导入配置文件
-const config = require('../config')
 // 导入qs
 const qs = require('qs')
 //定义计时器 容器
@@ -171,16 +167,17 @@ exports.telLogin = (req, res) => {
           } else {
             // 查询用户信息 生成token
             const selectInfo = `select * from userinfo where userid = ?`
-            db.query(selectInfo, [result[0].userid], (err3, result3) => {
+            db.query(selectInfo, [result1[0].userid], (err3, result3) => {
               if (err3) return res.cc(err3)
               data = {
                 tel,
-                userid: result[0].userid,
+                userid: result1[0].userid,
                 nickname: result3[0].nickname,
                 avatar: result3[0].avatar,
                 isvolunt: result3[0].isvolunt,
               }
               let token = qs.stringify(data)
+              console.log(token);
               res.send({
                 status: 200,
                 msg: '登录成功',
